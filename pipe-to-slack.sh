@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 while read line
 do
@@ -12,7 +12,7 @@ do
   NOW_TS="$(date +%s)"
   SECONDS_AGO="$(( $NOW_TS - $LAST_TS_TS ))"
 
-  if [ "$SECONDS_AGO" -gt 600 ]; then
+  if [ "$SECONDS_AGO" -gt 120 ]; then
     continue
   fi
 
@@ -28,13 +28,16 @@ do
     continue
   fi
 
-
+  if [[ "$MESSAGE" =~ ^Created\ container\ with\ docker\ id* ]]; then
+    continue
+  fi
 
   if [ "$KIND" != "" ]; then
 		EMOJI="kubernetes"
     if [ "$TYPE" != "Normal" ]; then
       EMOJI="this_is_fine"
     fi
+
     OUT="> $TYPE\n> Project: \`${NS}\`\n> Object: \`$KIND/$OBJECT\`\n> Component: \`$COMPONENT\`\n> Reasons: $REASON\n> Message: $MESSAGE"
     curl -s -X POST --data-urlencode "payload={\"channel\": \"#$SLACK_CHANNEL\", \"username\": \"openshift-$TYPE\", \"text\": \"$OUT\", \"icon_emoji\": \":$EMOJI:\"}" $SLACK_URL > /dev/null
     echo $line | jq -c .
