@@ -36,7 +36,7 @@ do
       EMOJI="this_is_fine"
     fi
     OUT="> $TYPE\n> Project: \`${NS}\`\n> Object: \`$KIND/$OBJECT\`\n> Component: \`$COMPONENT\`\n> Reasons: $REASON\n> Message: $MESSAGE"
-    curl -s -X POST --data-urlencode "payload={\"channel\": \"#$SLACK_CHANNEL\", \"username\": \"openshift-$TYPE\", \"text\": \"$OUT\", \"icon_emoji\": \":$EMOJI:\"}" $SLACK_URL
+    curl -s -X POST --data-urlencode "payload={\"channel\": \"#$SLACK_CHANNEL\", \"username\": \"openshift-$TYPE\", \"text\": \"$OUT\", \"icon_emoji\": \":$EMOJI:\"}" $SLACK_URL > /dev/null
     echo $line | jq -c .
   fi
 done < "${1:-/dev/stdin}"
