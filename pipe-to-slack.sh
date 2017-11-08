@@ -32,6 +32,10 @@ do
     continue
   fi
 
+  if [[ "$MESSAGE" =~ ^Killing\ container\ with\ docker\ id* ]]; then
+    continue
+  fi
+
   if [ "$KIND" != "" ]; then
 		EMOJI="kubernetes"
     if [ "$TYPE" != "Normal" ]; then
