@@ -23,17 +23,6 @@ do
   NS="$(echo ${line} | jq -r '.involvedObject.namespace')"
   KIND="$(echo ${line} | jq -r '.involvedObject.kind')"
 
-  if [ "$REASON" = "DesiredReplicasComputed" ]; then
-    continue
-  fi
-
-  if [[ "$MESSAGE" =~ ^Created\ container\ with\ docker\ id* ]]; then
-    continue
-  fi
-
-  if [[ "$MESSAGE" =~ ^Killing\ container\ with\ docker\ id* ]]; then
-    continue
-  fi
 
   if [ "$KIND" != "" ]; then
 		EMOJI="kubernetes"
@@ -56,11 +45,29 @@ do
 			| jq --arg FIELD "Message" --arg VALUE "$MESSAGE" '.attachments[0].fields += [{"title": $FIELD, "value": $VALUE}]' \
 			| jq . > /tmp/to-slack.json
 
-		PAYLOAD="$(cat /tmp/to-slack.json)"
 
-    curl -s -X POST --data-urlencode "payload=$PAYLOAD" $SLACK_URL > /dev/null
 		LOG_MESSAGE="{\"openshiftEvent\":$line}"
 		echo "$LOG_MESSAGE" | jq -c .
+
+		if [ "$REASON" = "DesiredReplicasComputed" ]; then
+			continue
+		fi
+
+		if [[ "$REASON" = "Pulled" ]]; then
+			continue
+		fi
+
+
+		if [[ "$MESSAGE" =~ ^Created\ container\ with\ docker\ id* ]]; then
+			continue
+		fi
+
+		if [[ "$MESSAGE" =~ ^Killing\ container\ with\ docker\ id* ]]; then
+			continue
+		fi
+
+		PAYLOAD="$(cat /tmp/to-slack.json)"
+    curl -s -X POST --data-urlencode "payload=$PAYLOAD" $SLACK_URL > /dev/null
 
   fi
 done < "${1:-/dev/stdin}"
