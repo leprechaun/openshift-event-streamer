@@ -41,8 +41,26 @@ do
       EMOJI="this_is_fine"
     fi
 
-    OUT="> $TYPE\n> Project: \`${NS}\`\n> Object: \`$KIND/$OBJECT\`\n> Component: \`$COMPONENT\`\n> Reasons: $REASON\n> Message: $MESSAGE"
-    curl -s -X POST --data-urlencode "payload={\"channel\": \"#$SLACK_CHANNEL\", \"username\": \"openshift-$TYPE\", \"text\": \"$OUT\", \"icon_emoji\": \":$EMOJI:\"}" $SLACK_URL > /dev/null
-    echo $line | jq -c .
+
+    echo '{}' \
+			| jq --arg CHANNEL "#$SLACK_CHANNEL" '. + { "channel": $CHANNEL }' \
+			| jq --arg USERNAME "Openshift-$TYPE" '. + { "username": $USERNAME }' \
+			| jq --arg EMOJI ":$EMOJI:" '. + { "emoji": $EMOJI }' \
+			| jq '. + { "attachments": [{"fields":[], "title": "Openshift Event"}]}' \
+			| jq --arg FIELD "Type" --arg VALUE "$TYPE" '.attachments[0].fields += [{"title": $FIELD, "value": $VALUE}]' \
+			| jq --arg FIELD "Project" --arg VALUE "$NS" '.attachments[0].fields += [{"title": $FIELD, "value": $VALUE}]' \
+			| jq --arg FIELD "Component" --arg VALUE "$COMPONENT" '.attachments[0].fields += [{"title": $FIELD, "value": $VALUE}]' \
+			| jq --arg FIELD "Kind" --arg VALUE "$KIND" '.attachments[0].fields += [{"title": $FIELD, "value": $VALUE}]' \
+			| jq --arg FIELD "Object" --arg VALUE "$OBJECT" '.attachments[0].fields += [{"title": $FIELD, "value": $VALUE}]' \
+			| jq --arg FIELD "Reason" --arg VALUE "$REASON" '.attachments[0].fields += [{"title": $FIELD, "value": $VALUE}]' \
+			| jq --arg FIELD "Message" --arg VALUE "$MESSAGE" '.attachments[0].fields += [{"title": $FIELD, "value": $VALUE}]' \
+			| jq . > /tmp/to-slack.json
+
+		PAYLOAD="$(cat /tmp/to-slack.json)"
+
+    curl -s -X POST --data-urlencode "payload=$PAYLOAD" $SLACK_URL > /dev/null
+		LOG_MESSAGE="{\"openshiftEvent\":$line}"
+		echo "$LOG_MESSAGE" | jq -c .
+
   fi
 done < "${1:-/dev/stdin}"
