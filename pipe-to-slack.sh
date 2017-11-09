@@ -66,6 +66,10 @@ do
 			continue
 		fi
 
+		if [ "$TYPE" = "Normal" ]; then
+			continue
+		fi
+
 		PAYLOAD="$(cat /tmp/to-slack.json)"
     curl -s -X POST --data-urlencode "payload=$PAYLOAD" $SLACK_URL > /dev/null
 
