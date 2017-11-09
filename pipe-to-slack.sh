@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
-while read line
+while read -r line
 do
-
   LAST_TS="$(echo $line | jq -r '.lastTimestamp')"
   if [ -z "$LAST_TS" ]; then
     continue
