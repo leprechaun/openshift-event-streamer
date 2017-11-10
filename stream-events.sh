@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
 
-oc -n $NAMESPACE get events -w -o json | jq -c -M . | pipe-to-slack
+while true; do
+	oc -n $NAMESPACE get events -w -o json | jq -c -M . | pipe-to-slack
+	sleep 30
+done

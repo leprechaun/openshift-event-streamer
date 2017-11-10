@@ -11,7 +11,7 @@ do
   NOW_TS="$(date +%s)"
   SECONDS_AGO="$(( $NOW_TS - $LAST_TS_TS ))"
 
-  if [ "$SECONDS_AGO" -gt 120 ]; then
+  if [ "$SECONDS_AGO" -gt 60 ]; then
     continue
   fi
 
