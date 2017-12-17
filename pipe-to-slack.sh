@@ -2,6 +2,7 @@
 
 while read -r line
 do
+	echo "'$line'"
   LAST_TS="$(echo $line | jq -r '.lastTimestamp')"
   if [ -z "$LAST_TS" ]; then
     continue
@@ -9,7 +10,7 @@ do
 
   LAST_TS_TS="$(date +%s -d$LAST_TS)"
   NOW_TS="$(date +%s)"
-  SECONDS_AGO="$(( $NOW_TS - $LAST_TS_TS ))"
+  SECONDS_AGO="$(( $NOW_TS - ${LAST_TS_TS-0} ))"
 
   if [ "$SECONDS_AGO" -gt 60 ]; then
     continue
