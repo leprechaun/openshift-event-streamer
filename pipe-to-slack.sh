@@ -70,8 +70,10 @@ do
 			continue
 		fi
 
-		PAYLOAD="$(cat /tmp/to-slack.json)"
-    curl -s -X POST --data-urlencode "payload=$PAYLOAD" $SLACK_URL > /dev/null
+		if [[ -n "$SLACK_URL" ]]; then
+			PAYLOAD="$(cat /tmp/to-slack.json)"
+			curl -s -X POST --data-urlencode "payload=$PAYLOAD" $SLACK_URL > /dev/null
+		fi
 
   fi
 done < "${1:-/dev/stdin}"
