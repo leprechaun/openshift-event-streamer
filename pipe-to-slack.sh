@@ -2,7 +2,6 @@
 
 while read -r line
 do
-	echo "'$line'"
   LAST_TS="$(echo $line | jq -r '.lastTimestamp')"
   if [ -z "$LAST_TS" ]; then
     continue
