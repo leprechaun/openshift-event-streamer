@@ -2,18 +2,6 @@
 
 while read -r line
 do
-  LAST_TS="$(echo $line | jq -r '.lastTimestamp')"
-  if [ -z "$LAST_TS" ]; then
-    continue
-  fi
-
-  LAST_TS_TS="$(date +%s -d$LAST_TS)"
-  NOW_TS="$(date +%s)"
-  SECONDS_AGO="$(( $NOW_TS - ${LAST_TS_TS-0} ))"
-
-  if [ "$SECONDS_AGO" -gt 60 ]; then
-    continue
-  fi
 
   TYPE="$(echo $line | jq -r '.type')"
   REASON="$(echo ${line} | jq -r '.reason')"
@@ -29,7 +17,6 @@ do
     if [ "$TYPE" != "Normal" ]; then
       EMOJI="this_is_fine"
     fi
-
 
     echo '{}' \
 			| jq --arg CHANNEL "#$SLACK_CHANNEL" '. + { "channel": $CHANNEL }' \
